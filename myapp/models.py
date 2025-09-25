@@ -72,10 +72,57 @@ class MontaPote(models.Model):
     coberturas = models.ManyToManyField(Cobertura)
     quantidade = models.PositiveIntegerField(null=True)
     
-    def __str__(self):
-        return f"ID: {self.id} / POTE: {self.embalagem.tipo} \
-            / Qtd: {self.quantidade} / {self.preco_total()}"
+    def __str__(self):          
+        return f"ID: {self.id} / POTE: {self.embalagem.tipo} / Qtd: {self.quantidade}"
 
     class Meta:
         verbose_name = 'B - MontaPote'
         verbose_name_plural = 'B - MontaPote'
+        
+# Seleção de sabores
+class SelSabor(models.Model):
+    pote = models.ForeignKey(MontaPote, 
+                             related_name='pote', 
+                             on_delete=models.CASCADE, null=True)
+    sabor = models.ForeignKey(Sabor, 
+                              related_name='sabor', 
+                              on_delete=models.CASCADE, null=True)
+    quantidade_bolas = models.PositiveIntegerField(null=True)
+    
+    def __str__(self):
+        return f"Sabor: {self.sabor.nome}, \
+        Quantidade de Bolas: {self.quantidade_bolas}"
+    
+    class Meta:
+        verbose_name = 'A - SelSabor'
+        verbose_name_plural = 'A - SelSabor'
+        
+# Sacola de Itens
+class SacolaItens(models.Model):
+    potes = models.ManyToManyField(MontaPote)
+    preco = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    
+    def preco_formatado(self):
+        return f'R$ {self.preco:.2f}'   
+    
+    def __str__(self):
+        return f"CARINHO {self.id}"
+    
+    class Meta:
+        verbose_name = 'C - SacolaItens'
+        verbose_name_plural = 'C - SacolaItens'
+        
+# Registro de Pedido
+class Pedido(models.Model):
+    data_pedido = models.DateTimeField(auto_now_add=True, null=True)
+    user = models.ForeignKey(User, related_name='pedido_user', on_delete=models.PROTECT)
+    itens_da_sacola = models.OneToOneField(SacolaItens, on_delete=models.CASCADE, null=True)
+    status = models.BooleanField()
+    pago = models.BooleanField()
+
+    def __str__(self):
+        return f"Pedido: {self.id} / {self.user} / (PAGO: {self.pago})"
+
+    class Meta:
+        verbose_name = 'D - Pedido'
+        verbose_name_plural = 'D - Pedido'
