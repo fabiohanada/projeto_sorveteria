@@ -1,12 +1,13 @@
 from django.contrib import admin
-from .models import Embalagem, TipoSabor, Sabor, Cobertura, MontaPote, SelSabor, SacolaItens, Pedido
+from .models import *
+
 
 # Register your models here.
 admin.site.register(Embalagem)
 admin.site.register(TipoSabor)
 admin.site.register(Sabor)
 admin.site.register(Cobertura)
-
+admin.site.register(SelSabor)
 
 # Monta Pote - Adiciona os sabores ao modelo MontaPote usando TabularInline
 class SelSaborInline(admin.TabularInline):
@@ -25,8 +26,13 @@ class PedidoInline(admin.StackedInline):
     model = Pedido
     extra = 0  # Número de formulários vazios adicionais
 
+#sacola de itens
+class MontaPoteinLine(admin.TabularInline):
+    model = SacolaItens.potes.through
+    extra = 0
+
 @admin.register(SacolaItens)
 class SacolaItensAdmin(admin.ModelAdmin):
-    fields = ('preco',)  # Campos a serem exibidos no modelo SacolaItens
-    readonly_fields = ('preco',)  # O campo preço será somente leitura
-    inlines = [PedidoInline, MontaPoteInline]  # Adiciona os inlines para Pedido e MontaPote
+    fields = ('preco',)
+    readonly_fields = ('preco',)  # Adicione o campo readonly para mostrar o preço total
+    inlines = [PedidoInline, MontaPoteInline]
